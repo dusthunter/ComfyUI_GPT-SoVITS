@@ -8,14 +8,6 @@ from tools.i18n.i18n import I18nAuto
 
 i18n = I18nAuto()
 
-# --- Global Paths (Hardcoded as requested) ---
-
-# cnhubert_base_path = "GPT_SoVITS/pretrained_models/chinese-hubert-base" # CNHubert 底模型路径
-# bert_path = "GPT_SoVITS/pretrained_models/chinese-roberta-wwm-ext-large" # BERT 模型路径
-# v3_bigvgan_path = "GPT_SoVITS/pretrained_models/models--nvidia--bigvgan_v2_24khz_100band_256x" # BigVGAN v3 模型路径
-# gpt_v3_pretrained = "GPT_SoVITS/pretrained_models/s1v3.ckpt"
-# sovits_v3_pretrained = "GPT_SoVITS/pretrained_models/s2Gv3.pth"
-
 dict_language_ui = {
     "中文": "all_zh", "英文": "en", "日文": "all_ja", "粤语": "all_yue", "韩文": "all_ko",
     "中英混合": "zh", "日英混合": "ja", "粤英混合": "yue", "韩英混合": "ko",
@@ -241,11 +233,11 @@ class GPTSoVITS_Inference:
         """
         # Directly use folder_paths.models_dir
         models_dir = folder_paths.models_dir # 获取 ComfyUI 模型目录      
-        sovits_v3_dir = os.path.join(models_dir, "SoVITS_weights_v3") # SoVITS v3 模型权重目录
-        gpt_v3_dir = os.path.join(models_dir, "GPT_weights_v3") # GPT v3 模型权重目录
+        sovits_v3_dir = os.path.join(models_dir, "SoVITS_weights") # SoVITS v3 模型权重目录
+        gpt_v3_dir = os.path.join(models_dir, "GPT_weights") # GPT v3 模型权重目录
         sovits_v3_files = [f for f in os.listdir(sovits_v3_dir) if f.endswith(".pth")] if os.path.exists(sovits_v3_dir) else [] # 获取 SoVITS v3 模型权重文件列表
         gpt_v3_files = [f for f in os.listdir(gpt_v3_dir) if f.endswith(".ckpt")] if os.path.exists(gpt_v3_dir) else [] # 获取 GPT v3 模型权重文件列表    
-        sovits_choices =["s2Gv3.pth"] + sorted(sovits_v3_files) # 排序 SoVITS 模型选项
+        sovits_choices =["s2Gv4.pth"] + sorted(sovits_v3_files) # 排序 SoVITS 模型选项
         gpt_choices = ["s1v3.ckpt"] + sorted(gpt_v3_files) # 排序 GPT 模型选项    
 
         return {
@@ -273,14 +265,14 @@ class GPTSoVITS_Inference:
     def run_gpt_inference(self, ref_audio, ref_features, target_features, gpt_model, sovits_model, seed, temperature, top_k, top_p,sample_steps,speed,pause_second,enable_upsampled):
         models_dir = folder_paths.models_dir # 获取 ComfyUI 模型目录
         pretrained_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "GPT_SoVITS/pretrained_models")
-        if sovits_model == "s2Gv3.pth":
-            sovits_model_path = os.path.join(pretrained_dir,sovits_model)
+        if sovits_model == "s2Gv4.pth":
+            sovits_model_path = os.path.join(pretrained_dir,"gsv-v4-pretrained/s2Gv4.pth")
         else:
-            sovits_model_path = os.path.join(models_dir, "SoVITS_weights_v3", sovits_model) # 构建 SoVITS 模型路径
+            sovits_model_path = os.path.join(models_dir, "SoVITS_weights", sovits_model) # 构建 SoVITS 模型路径
         if gpt_model == "s1v3.ckpt":
-            gpt_model_path = os.path.join(pretrained_dir,gpt_model)
+            gpt_model_path = os.path.join(pretrained_dir,"s1v3.ckpt")
         else:
-            gpt_model_path = os.path.join(models_dir, "GPT_weights_v3", gpt_model) # 构建 GPT 模型路径
+            gpt_model_path = os.path.join(models_dir, "GPT_weights", gpt_model) # 构建 GPT 模型路径
 
         ref_text = ref_features["ref_text"]
         ref_language = ref_features["ref_language"]
